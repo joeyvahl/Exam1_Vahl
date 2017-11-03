@@ -1,0 +1,47 @@
+#!/bin/sh
+####  PBS preamble
+
+#PBS -N Assignment
+#PBS -V
+
+# Change the number of cores (ppn=4), amount of memory, and walltime
+# based on what your job will require:
+#PBS -l nodes=1:ppn=4,mem=47gb,walltime=02:00:00
+
+#PBS -A eeb416f17_flux
+#PBS -q flux
+#PBS -l qos=flux
+#PBS -M joeyvahl@umich.edu
+#PBS -m abe 
+#PBS -j oe 
+
+####  End PBS preamble
+
+module load samtools/1.5
+module load bwa
+
+#  Show list of CPUs you ran on, if you're running under PBS
+if [ -n "$PBS_JOBID" ]; then echo -n "Running on nodes/cores: "; qstat -n $PBS_JOBID | tail -1; fi
+
+#  Change to the directory you submitted from
+if [ -n "$PBS_O_WORKDIR" ]; then cd $PBS_O_WORKDIR; fi; echo -n "Current working directory: "; pwd
+echo
+
+#  Echo job script commands as they are executed
+set -x
+
+#  Put your job script commands here:
+
+bwa index -a is Homo_sapiens.GRCh38.cds.all.fa > bwa_index.stdout 2> bwa_index.stderr
+bwa aln -t4 Homo_sapiens.GRCh38.cds.all.fa Homo_sapiens.GRCh38.82.abinitio.gtf > Homo_sapiens.sai 2> Homo_sapiens.stderr
+bwa sampe Homo_sapiens.GRCh38.cds.all.fa Homo_sapiens.sai
+Homo_sapiens.GRCh38.82.abinitio.gtf > Homo_sapiens.sam 2> Homo_sapiens_sampe.stderr
+
+# Return only primary reads
+samtools view -b Homo_sapiens.sam > Homo_sapiens.bam
+samtools view -F 0x904 -f 0x40 -b Homo_sapiens.bam > output.filter.bam
+
+# Get read counts
+samtools sort -@ 4 -m 8G output.filter.bam -o output.filter.sorted.bam
+samtools index output.filter.sorted.bam 
+samtools idxstats output.filter.sorted.bam > output.counts.txt
