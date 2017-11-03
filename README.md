@@ -15,15 +15,27 @@ PBS script for long job
 
 ### Exam1_Vahl.rmd
 RMarkdown file with all of the code
-exon = all exons                      
+
+exon = all exons 
+
 transcript = all transcripts
-exonA = Average exon length           
+
+exonA = Average exon length    
+
 transcriptA = Average transcript length
-exonB = # exons per chromosome        
+
+exonB = # exons per chromosome    
+
 transcriptB = # transcripts per chromosome
+
 exonC = Standard Deviation for exons  
+
 transcriptC = Standard Deviation for transcripts
+
 exonALL = merged data for SE of exons 
+
 transcriptALL = merged data for SE of transcripts
+
 exonX = all exons on X chromosome     
+
 exonY = all exons on Y chromosome
