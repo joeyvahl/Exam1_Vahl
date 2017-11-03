@@ -1,0 +1,79 @@
+---
+title: "Exam1_Vahl"
+author: Joseph Vahl
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r load Exon data}
+exon <- read.delim("~/Exam1/Homo_sapiens.GRCh38.82.abinitio.exon.gtf", header=FALSE)
+colnames(exon)[1] <- "Chromosome"
+colnames(exon)[2] <- "Type"
+colnames(exon)[3] <- "Start Position"
+colnames(exon)[4] <- "Stop Position"
+```
+
+```{r load transcipt data}
+transcript <- read.delim("~/Exam1/Homo_sapiens.GRCh38.82.abinitio.transcript.gtf", header=FALSE)
+colnames(transcript)[1] <- "Chromosome"
+colnames(transcript)[2] <- "Type"
+colnames(transcript)[3] <- "Start Position"
+colnames(transcript)[4] <- "Stop Position"
+```
+
+```{r install ggplot}
+install.packages("ggplot2")
+```
+
+```{r Exon and Transcript Lengths}
+exon$length <- (exon$`Stop Position` - exon$`Start Position`)
+exonA <- aggregate(exon$length, list(exon$Chromosome), mean)
+colnames(exonA)[1] <- "Chromosome"
+colnames(exonA)[2] <- "Average Exon Length"
+transcript$length <- (transcript$`Stop Position` - transcript$`Start Position`)
+transcriptA <- aggregate(transcript$length, list(transcript$Chromosome), mean)
+colnames(transcriptA)[1] <- "Chromosome"
+colnames(transcriptA)[2] <- "Average Transcript Length"
+exonB <- aggregate(exon$Chromosome, list(exon$Chromosome), summary)
+colnames(exonB)[1] <- "Chromosome"
+colnames(exonB)[2] <- "# Per Chromosome"
+transcriptB <- aggregate(transcript$Chromosome, list(transcript$Chromosome), summary)
+colnames(transcriptB)[1] <- "Chromosome"
+colnames(transcriptB)[2] <- "# Per Chromosome"
+exonC <- aggregate(exon$length, list(exon$Chromosome), sd)
+colnames(exonC)[1] <- "Chromosome"
+colnames(exonC)[2] <- "Standard Deviation"
+transcriptC <- aggregate(transcript$length, list(transcript$Chromosome), sd)
+colnames(transcriptC)[1] <- "Chromosome"
+colnames(transcriptC)[2] <- "Standard Deviation"
+exonALL <- merge(exonB,exonC, by.x="Chromosome", by.y="Chromosome")
+exonALL$SE <- sd(exonALL$'Standard Deviation', na.rm=TRUE) / sqrt(exonALL$'# Per Chromosome')
+transcriptALL <- merge(transcriptB,transcriptC, by.x="Chromosome", by.y="Chromosome")
+transcriptALL$SE <- sd(transcriptALL$'Standard Deviation', na.rm=TRUE) / sqrt(transcriptALL$'# Per Chromosome')
+```
+
+
+```{r Frequency Histogram of exon lengths for X and Y}
+exonX <- subset(exon, exon$Chromosome==c("X"))
+colnames(exonX)[1] <- "Chromosome"
+colnames(exonX)[2] <- "Type"
+colnames(exonX)[3] <- "Start Position"
+colnames(exonX)[4] <- "Stop Position"
+exonY <- subset(exon, exon$Chromosome==c("Y"))
+colnames(exonY)[1] <- "Chromosome"
+colnames(exonY)[2] <- "Type"
+colnames(exonY)[3] <- "Start Position"
+colnames(exonY)[4] <- "Stop Position"
+hist(exonX$length)
+hist(exonY$length)
+```
+
+```{r relationship}
+
+```
+
